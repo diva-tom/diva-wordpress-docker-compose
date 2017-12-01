@@ -1,0 +1,37 @@
+version: '2'
+services:
+  wordpress:
+    build: .
+    ports:
+      - 127.0.0.1:80:80
+    volumes:
+      - ./config/php.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./www:/var/www/html # Full wordpress project
+      #- ./plugin-name/trunk/:/var/www/html/wp-content/plugins/plugin-name # Plugin development
+      #- ./theme-name/trunk/:/var/www/html/wp-content/themes/theme-name # Theme development
+    environment:
+      VIRTUAL_HOST: ${PROJECT_NAME}
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${PROJECT_NAME}
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: password
+    depends_on:
+      - db
+    networks:
+      - wordpress-network
+  db:
+    image: mysql:latest # https://hub.docker.com/_/mysql/ - or mariadb https://hub.docker.com/_/mariadb
+    restart: always
+    ports:
+      - 127.0.0.1:3306:3306
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_DATABASE: ${PROJECT_NAME}
+      MYSQL_ROOT_PASSWORD: password
+    networks:
+      - wordpress-network
+networks:
+  wordpress-network:
+      driver: bridge
+
