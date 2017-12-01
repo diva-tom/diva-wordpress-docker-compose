@@ -1,5 +1,7 @@
 FROM wordpress:latest
 RUN apt-get update && apt-get install -y \
     wget \
+    libmcrypt-dev \
     unzip \
-    git
+    git \
+    && docker-php-ext-install mcrypt mbstring
